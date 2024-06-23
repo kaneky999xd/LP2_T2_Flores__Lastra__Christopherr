@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Empleados</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background-color: #4a5568;
+            color: #ffffff;
+        }
+
+        .navbar a {
+            padding: 10px 20px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4a5568;
+            margin-bottom: 20px;
+        }
+
+        .search-form {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            flex: 1;
+            margin-right: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .search-button {
+            background-color: #4a5568;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .search-button:hover {
+            background-color: #2d3748;
+        }
+
+        .clear-button {
+            background-color: #cbd5e0;
+            color: #4a5568;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .clear-button:hover {
+            background-color: #a0aec0;
+        }
+
+        .employee-list {
+            background-color: #edf2f7;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            margin-top: 20px;
+            padding: 10px;
+        }
+
+        .employee-item {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 10px;
+            align-items: center;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #ffffff;
+            border: 1px solid #d2d6dc;
+            border-radius: 4px;
+        }
+
+        .employee-item:nth-child(even) {
+            background-color: #f7fafc;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .action-link {
+            color: #4a90e2;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        .action-link:hover {
+            color: #2c5282;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+
+    <nav class="navbar">
+        <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+            <div class="flex items-center h-16">
+                <div class="flex items-center sm:justify-start">
+                    <div class="hidden sm:block">
+                        <div class="flex space-x-4">
+                            <a href="/" class="px-3 py-2">Inicio</a>
+                            <a href="/create" class="text-gray-300 hover:text-white hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium">Registrar Empleado</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h3 class="page-title">Lista de Empleados</h3>
+
+        <!-- Formulario de búsqueda por ID -->
+        <form th:action="@{/empleado}" method="get" class="search-form">
+            <input type="text" class="search-input" placeholder="Buscar por DNI" name="id" th:value="${dniBuscado}" pattern="[0-9]*" inputmode="numeric" id="dniInput">
+            <button type="submit" class="search-button" id="buscarButton">Buscar</button>
+            <button type="button" class="clear-button" id="borrarButton">Limpiar</button>
+        </form>
+
+        <!-- Lista de empleados -->
+        <div class="employee-list">
+            <div class="grid grid-cols-8 gap-4 text-sm font-medium text-gray-500 bg-gray-50 px-4 py-2">
+                <div>Dni</div>
+                <div>Nombres</div>
+                <div>Apellidos</div>
+                <div>Fecha de Nacimiento</div>
+                <div>Dirección</div>
+                <div>Correo</div>
+                <div>Área</div>
+                <div>Operación</div>
+            </div>
+
+            <!-- Iteración sobre la lista de empleados -->
+            <div th:each="empleado : ${lst_empleados}" class="employee-item">
+                <div th:text="${empleado.dniEmpleado}" class="text-sm text-gray-900"></div>
+                <div th:text="${empleado.nombreEmpleado}" class="text-sm text-gray-900"></div>
+                <div th:text="${empleado.apellidoEmpleado}" class="text-sm text-gray-900"></div>
+                <div th:text="${#dates.format(empleado.fechaNacimiento, 'dd-MM-yyyy')}" class="text-sm text-gray-900"></div>
+                <div th:text="${empleado.direccion}" class="text-sm text-gray-900"></div>
+                <div th:text="${empleado.correo}" class="text-sm text-gray-900"></div>
+                <div th:text="${empleado.area.nombreArea}" class="text-sm text-gray-900"></div>
+                <div class="actions">
+                    <a th:href="@{/delete/{id}(id=${empleado.dniEmpleado})}" class="action-link">Eliminar</a>
+                    <a th:href="@{/update/{id}(id=${empleado.dniEmpleado})}" class="action-link">Editar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('borrarButton').addEventListener('click', function () {
+            document.getElementById('dniInput').value = '';
+        });
+    </script>
+
+</body>
+
+</html>
